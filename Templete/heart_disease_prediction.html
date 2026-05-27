@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Heart Disease Prediction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Poppins", sans-serif;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(255, 90, 90, 0.25), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(0, 170, 150, 0.25), transparent 30%),
+                linear-gradient(135deg, #101820, #1f2937);
+            color: #1f2937;
+            padding: 30px 15px;
+        }
+
+        .page {
+            max-width: 1150px;
+            margin: auto;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 25px;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .hero-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 28px;
+            padding: 35px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .badge {
+            display: inline-block;
+            background: #ffe4e6;
+            color: #be123c;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            line-height: 1.1;
+            margin-bottom: 15px;
+            color: #111827;
+        }
+
+        .hero p {
+            color: #6b7280;
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .hero-side {
+            background: linear-gradient(145deg, #ef4444, #14b8a6);
+            border-radius: 28px;
+            padding: 30px;
+            color: white;
+            min-height: 280px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .heart {
+            font-size: 70px;
+            margin-bottom: 20px;
+            animation: pulse 1.4s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        .hero-side h2 {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .hero-side p {
+            color: rgba(255, 255, 255, 0.88);
+            line-height: 1.6;
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 28px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .section-title {
+            margin: 28px 0 16px;
+            font-size: 22px;
+            color: #111827;
+            border-left: 5px solid #ef4444;
+            padding-left: 12px;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 14px;
+            font-size: 15px;
+            outline: none;
+            background: #fff;
+            transition: 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.15);
+        }
+
+        .small-text {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 6px;
+        }
+
+        .calculated-box {
+            padding: 14px;
+            border-radius: 14px;
+            background: #f0fdfa;
+            border: 1px dashed #14b8a6;
+            color: #0f766e;
+            font-weight: 700;
+            min-height: 48px;
+        }
+
+        .button-row {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            padding: 15px 24px;
+            border-radius: 999px;
+            font-size: 16px;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: linear-gradient(135deg, #ef4444, #14b8a6);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .result-card {
+            display: none;
+            margin-top: 25px;
+            padding: 28px;
+            border-radius: 24px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .risk-value {
+            font-size: 48px;
+            font-weight: 800;
+            margin: 10px 0;
+        }
+
+        .risk-low {
+            color: #16a34a;
+        }
+
+        .risk-high {
+            color: #dc2626;
+        }
+
+        .risk-message {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .disclaimer {
+            margin-top: 20px;
+            background: #fff7ed;
+            color: #9a3412;
+            padding: 15px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 950px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hero h1 {
+                font-size: 34px;
+            }
+        }
+
+        @media (max-width: 650px) {
+            body {
+                padding: 15px 10px;
+            }
+
+            .hero-card,
+            .hero-side,
+            .main-card {
+                padding: 22px;
+                border-radius: 22px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-row {
+                flex-direction: column;
+            }
+
+            .hero h1 {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="page">
+
+    <section class="hero">
+        <div class="hero-card">
+            <span class="badge">Machine Learning Project</span>
+            <h1>Heart Disease Prediction System</h1>
+            <p>
+                This web application predicts heart disease risk using patient health information,
+                lifestyle data, and a trained machine learning model.
+            </p>
+        </div>
+
+        <div class="hero-side">
+            <div class="heart">❤️</div>
+            <h2>Smart Health Risk Screening</h2>
+            <p>
+                Enter the required details and get a prediction result instantly.
+                This project is created for educational and academic purposes.
+            </p>
+        </div>
+    </section>
+
+    <div class="main-card">
+        <form id="predictionForm">
+
+            <h2 class="section-title">Patient Profile</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" name="Age" min="18" max="120" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Sex</label>
+                    <select name="Sex" required>
+                        <option value="">Select</option>
+                        <option value="1">Male</option>
+                        <option value="0">Female</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Annual Income</label>
+                    <input type="number" name="Income" min="0" required>
+                </div>
+            </div>
+
+            <h2 class="section-title">Clinical Measurements</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Cholesterol</label>
+                    <input type="number" name="Cholesterol" min="100" max="500" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Heart Rate</label>
+                    <input type="number" name="Heart Rate" min="40" max="220" required>
+                </div>
+
+                <div class="form-group">
+                    <label>BMI</label>
+                    <input type="number" name="BMI" min="10" max="60" step="0.1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Systolic Blood Pressure</label>
+                    <input type="number" id="systolic" name="Systolic BP" min="80" max="220" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Diastolic Blood Pressure</label>
+                    <input type="number" id="diastolic" name="Diastolic BP" min="40" max="140" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Triglycerides</label>
+                    <input type="number" name="Triglycerides" min="50" max="600" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Pulse Pressure</label>
+                    <div class="calculated-box" id="pulseBox">Auto calculated</div>
+                </div>
+            </div>
+
+            <h2 class="section-title">Lifestyle Details</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Smoking</label>
+                    <select name="Smoking" required>
+                        <option value="">Select</option>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Alcohol Consumption</label>
+                    <select name="Alcohol Consumption" required>
+                        <option value="">Select</option>
+                        <option value="0">None</option>
+                        <option value="1">Moderate</option>
+                        <option value="2">Heavy</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Exercise Hours Per Week</label>
+                    <input type="number" name="Exercise Hours Per Week" min="0" max="80" step="0.5" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Physical Activity Days Per Week</label>
+                    <input type="number" name="Physical Activity Days Per Week" min="0" max="7" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Sedentary Hours Per Day</label>
+                    <input type="number" id="sedentary" name="Sedentary Hours Per Day" min="0" max="24" step="0.5" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Sleep Hours Per Day</label>
+                    <input type="number" name="Sleep Hours Per Day" min="3" max="14" step="0.5" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Stress Level</label>
+                    <input type="number" name="Stress Level" min="1" max="10" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Diet Quality</label>
+                    <select name="Diet Quality" required>
+                        <option value="">Select</option>
+                        <option value="1">Healthy</option>
+                        <option value="2">Average</option>
+                        <option value="3">Unhealthy</option>
+                    </select>
+                </div>
+            </div>
+
+            <h2 class="section-title">Medical History</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Diabetes</label>
+                    <select name="Diabetes" required>
+                        <option value="">Select</option>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Family History</label>
+                    <select name="Family History" required>
+                        <option value="">Select</option>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Obesity</label>
+                    <select name="Obesity" required>
+                        <option value="">Select</option>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Previous Heart Problems</label>
+                    <select name="Previous Heart Problems" required>
+                        <option value="">Select</option>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Medication Use</label>
+                    <select name="Medication Use" required>
+                        <option value="">Select</option>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Continent</label>
+                    <select name="Continent" required>
+                        <option value="">Select</option>
+                        <option value="1">North America</option>
+                        <option value="2">Europe</option>
+                        <option value="3">Asia</option>
+                        <option value="4">Australia</option>
+                        <option value="5">South America</option>
+                        <option value="6">Africa</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button type="reset" class="btn-secondary">Clear Form</button>
+                <button type="submit" class="btn-primary">Predict Heart Disease</button>
+            </div>
+        </form>
+
+        <div class="result-card" id="resultCard">
+            <h2>Prediction Result</h2>
+            <div class="risk-value" id="riskValue">--</div>
+            <div class="risk-message" id="riskMessage">Waiting for prediction...</div>
+            <p id="riskDescription"></p>
+        </div>
+
+        <div class="disclaimer">
+            <strong>Disclaimer:</strong> This system is for educational purposes only.
+            It should not be used as a real medical diagnosis system. Always consult a qualified doctor.
+        </div>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById("predictionForm");
+    const resultCard = document.getElementById("resultCard");
+    const riskValue = document.getElementById("riskValue");
+    const riskMessage = document.getElementById("riskMessage");
+    const riskDescription = document.getElementById("riskDescription");
+
+    const systolic = document.getElementById("systolic");
+    const diastolic = document.getElementById("diastolic");
+    const pulseBox = document.getElementById("pulseBox");
+
+    function updatePulsePressure() {
+        const sys = parseFloat(systolic.value);
+        const dia = parseFloat(diastolic.value);
+
+        if (!isNaN(sys) && !isNaN(dia)) {
+            pulseBox.textContent = (sys - dia).toFixed(0);
+        } else {
+            pulseBox.textContent = "Auto calculated";
+        }
+    }
+
+    systolic.addEventListener("input", updatePulsePressure);
+    diastolic.addEventListener("input", updatePulsePressure);
+
+    form.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+        const data = {};
+
+        formData.forEach((value, key) => {
+            data[key] = Number(value);
+        });
+
+        const sys = parseFloat(systolic.value);
+        const dia = parseFloat(diastolic.value);
+        data["Pulse Pressure"] = sys - dia;
+
+        try {
+            riskValue.textContent = "Loading...";
+            riskMessage.textContent = "Predicting...";
+            riskDescription.textContent = "";
+            resultCard.style.display = "block";
+
+            const response = await fetch("/predict", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            const prediction = result.prediction ?? result.result ?? result.risk ?? result.output;
+            const probability = result.probability ?? result.risk_percentage ?? result.percentage;
+
+            if (probability !== undefined) {
+                riskValue.textContent = Number(probability).toFixed(2) + "%";
+            } else {
+                riskValue.textContent = prediction == 1 ? "High Risk" : "Low Risk";
+            }
+
+            if (prediction == 1 || String(prediction).toLowerCase().includes("high")) {
+                riskValue.className = "risk-value risk-high";
+                riskMessage.textContent = "High heart disease risk detected";
+                riskDescription.textContent = "Please consult a medical professional for proper check-up and advice.";
+            } else {
+                riskValue.className = "risk-value risk-low";
+                riskMessage.textContent = "Low heart disease risk detected";
+                riskDescription.textContent = "Maintain a healthy lifestyle and regular health check-ups.";
+            }
+
+        } catch (error) {
+            resultCard.style.display = "block";
+            riskValue.textContent = "Error";
+            riskValue.className = "risk-value risk-high";
+            riskMessage.textContent = "Cannot connect to prediction API";
+            riskDescription.textContent = "Check your Flask /predict route and run python app.py again.";
+        }
+    });
+</script>
+
+</body>
+</html>
